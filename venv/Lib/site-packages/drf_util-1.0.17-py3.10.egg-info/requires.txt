@@ -1,0 +1,8 @@
+Django>=1.11
+djangorestframework
+python-dateutil
+requests
+django-filter
+drf-yasg
+swagger-spec-validator
+varname
