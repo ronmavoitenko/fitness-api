@@ -1,8 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-from apps.media.models import Media
-from apps.foods.models import Foods
 from apps.workouts.models import Workouts
 
 # Create your models here.
@@ -11,7 +9,7 @@ from apps.workouts.models import Workouts
 class User(AbstractUser):
     birthdate = models.DateTimeField(null=True)
     phone = models.CharField(max_length=30)
-    profile_image = models.ForeignKey(Media, on_delete=models.CASCADE, null=True)
+    profile_image = models.FileField(upload_to='media/profile_image', null=True)
 
 # class User(models.Model):
 #     name = models.CharField(max_length=25)
@@ -25,6 +23,16 @@ class User(AbstractUser):
 #     created_at = models.DateTimeField(auto_now_add=True)
 
 
+class Foods(models.Model):
+    title = models.CharField(max_length=150)
+    fats = models.IntegerField()
+    carbs = models.IntegerField()
+    proteins = models.IntegerField()
+    calories = models.IntegerField()
+    modified_at = models.DateTimeField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
 class UserDailyPlan(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     calories = models.IntegerField()
@@ -36,3 +44,4 @@ class UserDailyPlan(models.Model):
     today_date = models.DateTimeField()
     modified_at = models.DateTimeField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
