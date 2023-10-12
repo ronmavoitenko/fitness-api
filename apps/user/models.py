@@ -11,17 +11,6 @@ class User(AbstractUser):
     phone = models.CharField(max_length=30)
     profile_image = models.FileField(upload_to='media/profile_image', null=True)
 
-# class User(models.Model):
-#     name = models.CharField(max_length=25)
-#     surname = models.CharField(max_length=30)
-#     birthdate = models.DateTimeField(null=True)
-#     email = models.EmailField()
-#     phone = models.CharField(max_length=30)
-#     password = models.CharField(max_length=100)
-#     profile_image = models.ForeignKey(Media, on_delete=models.CASCADE)
-#     modified_at = models.DateTimeField(null=True)
-#     created_at = models.DateTimeField(auto_now_add=True)
-
 
 class Foods(models.Model):
     title = models.CharField(max_length=150)

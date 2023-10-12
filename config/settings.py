@@ -37,10 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'drf_yasg',
     'apps.user',
-    'apps.media',
-    'apps.foods',
     'apps.workouts',
-    'apps.exercises',
 ]
 
 SWAGGER_SETTINGS = {
