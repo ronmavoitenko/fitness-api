@@ -24,6 +24,13 @@ SECRET_KEY = 'django-insecure-e*m*d3!3&svf-bj-d-b-lgtk$q-&i+qkl(20z-l99n36^8-l26
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'testsenddjango463@gmail.com'
+EMAIL_HOST_PASSWORD = 'fkyagjinruivaygl'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
 ALLOWED_HOSTS = []
 
 # Application definition
@@ -39,6 +46,19 @@ INSTALLED_APPS = [
     'apps.user',
     'apps.workouts',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 100
+}
+
 
 SWAGGER_SETTINGS = {
     'USE_SESSION_AUTH': False,
