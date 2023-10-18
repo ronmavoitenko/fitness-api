@@ -78,6 +78,8 @@ class UserChangesViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "update_account":
             return UpdateProfileSerializer
+        if self.action == "change_password":
+            return ChangePasswordSerializer
 
         return super().get_serializer_class()
 

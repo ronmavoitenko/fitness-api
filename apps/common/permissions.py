@@ -2,8 +2,6 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import permissions
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 
-from apps.user.models import User
-
 # Create your permissions here.
 
 
@@ -20,4 +18,4 @@ class IsUserOwner(permissions.BasePermission):
         return request.user.is_authenticated
 
     def has_object_permission(self, request, view, obj):
-        return obj.id == request.user.id
+        return obj.pk == request.user.user_daily_plan.id
