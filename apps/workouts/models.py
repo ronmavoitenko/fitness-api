@@ -7,7 +7,7 @@ class UserDailyPlan(models.Model):
     sleep = models.TimeField()
     water = models.FloatField()
     today_date = models.DateTimeField()
-    modified_at = models.DateTimeField(null=True)
+    modified_at = models.DateTimeField(auto_now=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     workouts = models.ManyToManyField('Workouts', related_name='workouts', blank=True)
 
@@ -18,7 +18,7 @@ class PlanAchievedResult(models.Model):
     sleep = models.TimeField()
     water = models.FloatField()
     plan = models.ForeignKey(UserDailyPlan, on_delete=models.CASCADE, null=True)
-    modified_at = models.DateTimeField(null=True)
+    modified_at = models.DateTimeField(auto_now=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
@@ -27,7 +27,7 @@ class StepsForPlan(models.Model):
     steps = models.IntegerField()
     start_time = models.TimeField()
     end_time = models.TimeField()
-    modified_at = models.DateTimeField(null=True)
+    modified_at = models.DateTimeField(auto_now=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     plan = models.ForeignKey(UserDailyPlan, on_delete=models.CASCADE, null=True)
 
@@ -39,7 +39,7 @@ class Foods(models.Model):
     carbs = models.IntegerField()
     proteins = models.IntegerField()
     calories = models.IntegerField()
-    modified_at = models.DateTimeField(null=True)
+    modified_at = models.DateTimeField(auto_now=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     plan = models.ForeignKey(UserDailyPlan, on_delete=models.CASCADE, null=True)
 
@@ -51,7 +51,7 @@ class Workouts(models.Model):
     duration = models.TimeField()
     calories = models.IntegerField()
     available = models.BooleanField()
-    modified_at = models.DateTimeField(null=True)
+    modified_at = models.DateTimeField(auto_now=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     exercises = models.ManyToManyField('Exercises', related_name='exercises', blank=True)
 
@@ -61,5 +61,5 @@ class Exercises(models.Model):
     duration = models.TimeField()
     video = models.FileField(upload_to='media/exercises_video', null=True)
     break_time = models.TimeField()
-    modified_at = models.DateTimeField(null=True)
+    modified_at = models.DateTimeField(auto_now=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
