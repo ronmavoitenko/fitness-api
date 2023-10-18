@@ -85,7 +85,6 @@ class UserChangesViewSet(viewsets.ModelViewSet):
 
     @action(methods=['post'], detail=False, serializer_class=UpdateProfileSerializer, url_path="update-account")
     def update_account(self, request, *args, **kwargs):
-        request.user.profile_image = request.data["profile_image"]
         request.user.first_name = request.data["first_name"]
         request.user.last_name = request.data["last_name"]
         request.user.email = request.data["email"]

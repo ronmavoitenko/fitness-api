@@ -46,7 +46,6 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            "profile_image",
             "first_name",
             "last_name",
             "email",
