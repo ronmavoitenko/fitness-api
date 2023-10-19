@@ -76,3 +76,13 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
             "old_password",
             "new_password",
         )
+
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    feedback = serializers.CharField(max_length=1000)
+
+    class Meta:
+        model = User
+        fields = (
+            "feedback",
+        )

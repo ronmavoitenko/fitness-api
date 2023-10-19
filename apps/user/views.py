@@ -3,9 +3,10 @@ import random
 from django.utils import timezone
 from django.contrib.auth import logout
 
+import config.settings
 from apps.user.models import User
 from apps.user.serializers import UserSerializer, CreateUserSerializer, ForgotChangePasswordSerializer, \
-    CheckCodeSerializer, UpdateProfileSerializer, ForgotPasswordSerializer, ChangePasswordSerializer
+    CheckCodeSerializer, UpdateProfileSerializer, ForgotPasswordSerializer, ChangePasswordSerializer, FeedbackSerializer
 
 from apps.common.helpers import send_notification
 from rest_framework.decorators import action
@@ -13,6 +14,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from apps.common.permissions import IsUserOwner
 from rest_framework import viewsets, status
+import django.conf
 
 
 class UserRegistrationViewSet(viewsets.ModelViewSet):
@@ -107,3 +109,9 @@ class UserChangesViewSet(viewsets.ModelViewSet):
             user.set_password(new_password)
             user.save()
             return Response("The password was changed", status.HTTP_200_OK)
+
+    @action(methods=['post'], detail=False, serializer_class=FeedbackSerializer, url_path="feedback")
+    def feedback(self, request,  *args, **kwargs):
+        feedback = request.data["feedback"]
+        send_notification(config.settings.EMAIL_HOST_USER, "Feedback", feedback)
+        return Response({"success": True}, status.HTTP_200_OK)
