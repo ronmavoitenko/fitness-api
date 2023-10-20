@@ -54,6 +54,17 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         )
 
 
+class NewVerificationCodeSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(max_length=50)
+
+    class Meta:
+        model = User
+        fields = (
+            "email",
+            "password",
+        )
+
+
 class ForgotChangePasswordSerializer(serializers.ModelSerializer):
     code = serializers.CharField()
     new_password = serializers.CharField(max_length=50)

@@ -6,7 +6,8 @@ from django.contrib.auth import logout
 import config.settings
 from apps.user.models import User
 from apps.user.serializers import UserSerializer, CreateUserSerializer, ForgotChangePasswordSerializer, \
-    CheckCodeSerializer, UpdateProfileSerializer, ForgotPasswordSerializer, ChangePasswordSerializer, FeedbackSerializer
+    CheckCodeSerializer, UpdateProfileSerializer, ForgotPasswordSerializer, ChangePasswordSerializer,\
+    FeedbackSerializer, NewVerificationCodeSerializer
 
 from apps.common.helpers import send_notification
 from rest_framework.decorators import action
@@ -33,7 +34,13 @@ class UserRegistrationViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         user = serializer.save(username=self.request.data["email"])
         user.set_password(serializer.validated_data['password'])
+        secret_code = ''.join(random.choices('0123456789', k=6))
+        while User.objects.filter(verification_code=secret_code).exists():
+            secret_code = ''.join(random.choices('0123456789', k=6))
+        user.verification_code = secret_code
+        user.verification_code_expires = timezone.now() + timezone.timedelta(minutes=30)
         user.save()
+        send_notification(user.email, "Your secret key for verification account", f"{secret_code}")
 
     @action(methods=['post'], detail=False, serializer_class=ForgotPasswordSerializer, url_path="forgot-pass")
     def forgot(self, *args, **kwargs):
@@ -114,4 +121,34 @@ class UserChangesViewSet(viewsets.ModelViewSet):
     def feedback(self, request,  *args, **kwargs):
         feedback = request.data["feedback"]
         send_notification(config.settings.EMAIL_HOST_USER, f"Feedback from {self.request.user.email}", feedback)
+        return Response({"success": True}, status.HTTP_200_OK)
+
+    @action(methods=['post'], detail=False, serializer_class=CheckCodeSerializer, url_path="user-verification")
+    def user_verification(self, request, *args, **kwargs):
+        code = str(self.request.data["secret_code"])
+        user = User.objects.get(verification_code=code)
+        if timezone.now() < user.verification_code_expires and self.request.user == user:
+            if user:
+                user.is_verified = True
+                user.save()
+                return Response({"success": True}, status.HTTP_200_OK)
+        else:
+            return Response({"success": False}, status.HTTP_400_BAD_REQUEST, "Enter again your email and password, "
+                                                                             "and get new code verification on you "
+                                                                             "email")
+
+    @action(methods=['post'], detail=False, serializer_class=NewVerificationCodeSerializer,
+            url_path="new_verification_code")
+    def get_new_verification_code(self, request, *args, **kwargs):
+        email = self.request.data["email"]
+        password = self.request.data["password"]
+        user = User.objects.get(email=email)
+        if user.check_password(password):
+            secret_code = ''.join(random.choices('0123456789', k=6))
+            while User.objects.filter(verification_code=secret_code).exists():
+                secret_code = ''.join(random.choices('0123456789', k=6))
+            send_notification(user.email, "Your secret key for verification account", f"{secret_code}")
+            user.verification_code = secret_code
+            user.verification_code_expires = timezone.now() + timezone.timedelta(minutes=1)
+            user.save()
         return Response({"success": True}, status.HTTP_200_OK)
