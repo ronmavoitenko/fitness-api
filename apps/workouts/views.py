@@ -25,6 +25,8 @@ class DailyPlanViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        if getattr(self, 'swagger_fake_view', False):
+            return super().get_queryset().none()
         if self.action == "plan_achieve":
             return queryset.filter(id=self.request.user.user_daily_plan.id)
 
@@ -41,6 +43,13 @@ class DailyPlanViewSet(viewsets.ModelViewSet):
         workout = Workouts.objects.get(id=kwargs.get("pk"))
         self.request.user.user_daily_plan.workouts.add(workout)
         return Response("Workout added to user's goals", status=status.HTTP_200_OK)
+
+    @action(methods=['patch'], detail=True, serializer_class=None, url_path="finish_goal")
+    def finish_goal(self, request, *args, **kwargs):
+        user_daily_plan = self.request.user.user_daily_plan
+        workout = Workouts.objects.get(id=kwargs.get("pk"))
+        user_daily_plan.workouts.remove(workout)
+        return Response("Workout was deleted from users goals", status=status.HTTP_200_OK)
 
     @action(methods=['post'], detail=False, serializer_class=PlanAchievementsSerializer, url_path="plan-achieve")
     def plan_achieve(self, request, *args, **kwargs):

@@ -33,7 +33,7 @@ class ForgotPasswordSerializer(serializers.ModelSerializer):
 
 
 class CheckCodeSerializer(serializers.ModelSerializer):
-    secret_code = serializers.IntegerField(min_value=1000, max_value=9999)
+    secret_code = serializers.IntegerField(min_value=000000, max_value=999999)
 
     class Meta:
         model = User

@@ -21,7 +21,7 @@ class UserRegistrationViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
     authentication_classes = ()
     serializer_class = UserSerializer
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by("id")
 
     def get_serializer_class(self):
         if self.action == "create":
@@ -37,9 +37,9 @@ class UserRegistrationViewSet(viewsets.ModelViewSet):
 
     @action(methods=['post'], detail=False, serializer_class=ForgotPasswordSerializer, url_path="forgot-pass")
     def forgot(self, *args, **kwargs):
-        secret_code = ''.join(random.choices('0123456789', k=4))
+        secret_code = ''.join(random.choices('0123456789', k=6))
         while User.objects.filter(verification_code=secret_code).exists():
-            secret_code = ''.join(random.choices('0123456789', k=4))
+            secret_code = ''.join(random.choices('0123456789', k=6))
         email = self.request.data["email"]
         user = User.objects.get(email=email)
         user.verification_code = secret_code
@@ -74,7 +74,7 @@ class UserRegistrationViewSet(viewsets.ModelViewSet):
 
 class UserChangesViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by("id")
     permission_classes = [IsUserOwner]
 
     def get_serializer_class(self):
@@ -113,5 +113,5 @@ class UserChangesViewSet(viewsets.ModelViewSet):
     @action(methods=['post'], detail=False, serializer_class=FeedbackSerializer, url_path="feedback")
     def feedback(self, request,  *args, **kwargs):
         feedback = request.data["feedback"]
-        send_notification(config.settings.EMAIL_HOST_USER, "Feedback", feedback)
+        send_notification(config.settings.EMAIL_HOST_USER, f"Feedback from {self.request.user.email}", feedback)
         return Response({"success": True}, status.HTTP_200_OK)
