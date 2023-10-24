@@ -4,8 +4,8 @@ from django.utils import timezone
 from django.contrib.auth import logout
 
 import config.settings
-from apps.user.models import User
-from apps.user.serializers import UserSerializer, CreateUserSerializer, ForgotChangePasswordSerializer, \
+from user.models import User
+from user.serializers import UserSerializer, CreateUserSerializer, ForgotChangePasswordSerializer, \
      CheckCodeSerializer, UpdateProfileSerializer, ForgotPasswordSerializer, ChangePasswordSerializer,\
      FeedbackSerializer, NewVerificationCodeSerializer
 
