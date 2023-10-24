@@ -45,8 +45,6 @@ INSTALLED_APPS = [
     'drf_yasg',
     'django_filters',
     'apps.user',
-    'apps.activity',
-    'apps.tasks',
     'apps.common',
 ]
 
