@@ -18,4 +18,4 @@ class IsUserOwner(permissions.BasePermission):
         return request.user.is_authenticated
 
     def has_object_permission(self, request, view, obj):
-        return obj.pk == request.user.user_daily_plan.id
+        return obj.pk == request.user.activity.id
