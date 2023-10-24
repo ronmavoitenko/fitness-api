@@ -45,7 +45,9 @@ INSTALLED_APPS = [
     'drf_yasg',
     'django_filters',
     'apps.user',
-    'apps.workouts',
+    'apps.activity',
+    'apps.tasks',
+    'apps.common',
 ]
 
 REST_FRAMEWORK = {
