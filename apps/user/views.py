@@ -1,5 +1,3 @@
-import random
-
 from django.utils import timezone
 from django.contrib.auth import logout
 
@@ -9,6 +7,7 @@ from apps.user.serializers import UserSerializer, CreateUserSerializer, ForgotCh
      CheckCodeSerializer, UpdateProfileSerializer, ForgotPasswordSerializer, ChangePasswordSerializer,\
      FeedbackSerializer, NewVerificationCodeSerializer
 
+from apps.common.helpers import generate_code
 from apps.common.helpers import send_notification
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -33,18 +32,14 @@ class UserViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         user = serializer.save(username=self.request.data["email"])
         user.set_password(serializer.validated_data['password'])
-        secret_code = ''.join(random.choices('0123456789', k=6))
-        while User.objects.filter(verification_code=secret_code).exists():
-            secret_code = ''.join(random.choices('0123456789', k=6))
+        secret_code = generate_code()
         user.verification_code = secret_code
         user.save()
         send_notification(user.email, "Your secret key for verification account", f"{secret_code}")
 
     @action(methods=['post'], detail=False, serializer_class=ForgotPasswordSerializer, url_path="forgot-pass")
     def forgot(self, *args, **kwargs):
-        secret_code = ''.join(random.choices('0123456789', k=6))
-        while User.objects.filter(verification_code=secret_code).exists():
-            secret_code = ''.join(random.choices('0123456789', k=6))
+        secret_code = generate_code()
         email = self.request.data["email"]
         user = User.objects.get(email=email)
         user.verification_code = secret_code
@@ -124,11 +119,8 @@ class UserViewSet(viewsets.ModelViewSet):
         password = self.request.data["password"]
         user = User.objects.get(email=email)
         if user.check_password(password):
-            secret_code = ''.join(random.choices('0123456789', k=6))
-            while User.objects.filter(verification_code=secret_code).exists():
-                secret_code = ''.join(random.choices('0123456789', k=6))
+            secret_code = generate_code()
             send_notification(user.email, "Your secret key for verification account", f"{secret_code}")
             user.verification_code = secret_code
-            user.verification_code_expires = timezone.now() + timezone.timedelta(minutes=1)
             user.save()
         return Response({"success": True}, status.HTTP_200_OK)
