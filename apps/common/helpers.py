@@ -28,5 +28,4 @@ def generate_code(length=6):
     range_start = 10 ** (length - 1)
     range_end = (10 ** length) - 1
     secret_code = random.randint(range_start, range_end)
-    while User.objects.filter(verification_code=secret_code).exists():
-        return secret_code
+    return secret_code
