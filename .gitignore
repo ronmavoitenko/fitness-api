@@ -1,0 +1,7 @@
+.idea/
+venv/
+*.pyc
+media/*
+.coverage
+htmlcov/*
+.mypy_cache/
