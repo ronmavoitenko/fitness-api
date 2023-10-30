@@ -9,15 +9,13 @@ from apps.user.serializers import UserSerializer, CreateUserSerializer, ForgotCh
 
 from apps.common.helpers import generate_code
 from apps.common.helpers import send_notification
-from rest_framework.decorators import action
+from rest_framework.decorators import action, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from apps.common.permissions import IsUserOwner
 from rest_framework import viewsets, status
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    permission_classes = (AllowAny,)
     serializer_class = UserSerializer
     queryset = User.objects.all().order_by("id")
 
@@ -28,6 +26,11 @@ class UserViewSet(viewsets.ModelViewSet):
             return ForgotPasswordSerializer
         return super().get_serializer_class()
 
+    def get_permissions(self):
+        if self.action == 'create':
+            self.permission_classes = [AllowAny, ]
+        return super().get_permissions()
+
     def perform_create(self, serializer):
         user = serializer.save(username=self.request.data["email"])
         user.set_password(serializer.validated_data['password'])
@@ -36,7 +39,7 @@ class UserViewSet(viewsets.ModelViewSet):
         user.save()
         send_notification(user.email, "Your secret key for verification account", f"{secret_code}")
 
-    @action(methods=['post'], detail=False, serializer_class=ForgotPasswordSerializer, url_path="forgot-pass")
+    @action(methods=['post'], detail=False, serializer_class=ForgotPasswordSerializer, url_path="forgot-pass", permission_classes=[AllowAny])
     def forgot(self, *args, **kwargs):
         secret_code = generate_code()
         email = self.request.data["email"]
@@ -46,7 +49,7 @@ class UserViewSet(viewsets.ModelViewSet):
         send_notification(user.email, "Your secret key for confirming account", f"{secret_code}")
         return Response({"success": True}, status.HTTP_200_OK)
 
-    @action(methods=['post'], detail=False, serializer_class=CheckCodeSerializer, url_path="verify")
+    @action(methods=['post'], detail=False, serializer_class=CheckCodeSerializer, url_path="verify", permission_classes=[AllowAny])
     def verify(self, request, *args, **kwargs):
         code = str(self.request.data["secret_code"])
         user = User.objects.get(verification_code=code)
@@ -55,7 +58,7 @@ class UserViewSet(viewsets.ModelViewSet):
         else:
             return Response({"success": False}, status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['post'], detail=False, serializer_class=ForgotChangePasswordSerializer, url_path="change-password")
+    @action(methods=['post'], detail=False, serializer_class=ForgotChangePasswordSerializer, url_path="change-password", permission_classes=[AllowAny])
     def change_password(self, request, *args, **kwargs):
         new_password = request.data.get("new_password")
         code = request.data.get("code")
@@ -66,7 +69,7 @@ class UserViewSet(viewsets.ModelViewSet):
             user.verification_code = None
             return Response({"success": True, "message": "Password changed successfully."}, status.HTTP_200_OK)
 
-    @action(methods=['post'], detail=False, serializer_class=UpdateProfileSerializer, url_path="update-account", permission_classes=[IsUserOwner])
+    @action(methods=['post'], detail=False, serializer_class=UpdateProfileSerializer, url_path="update-account")
     def account(self, request, *args, **kwargs):
         request.user.first_name = request.data["first_name"]
         request.user.last_name = request.data["last_name"]
@@ -76,12 +79,12 @@ class UserViewSet(viewsets.ModelViewSet):
         request.user.save()
         return Response({"success": True}, status.HTTP_200_OK)
 
-    @action(methods=['post'], detail=False, serializer_class=None, url_path="logout", permission_classes=[IsUserOwner])
+    @action(methods=['post'], detail=False, serializer_class=None, url_path="logout")
     def logout(self, request):
         logout(request)
         return Response("Successfully logged out", status=status.HTTP_200_OK)
 
-    @action(methods=['post'], detail=False, serializer_class=ChangePasswordSerializer, url_path="change-password", permission_classes=[IsUserOwner])
+    @action(methods=['post'], detail=False, serializer_class=ChangePasswordSerializer, url_path="change-password")
     def change(self, request):
         old_password = request.data["old_password"]
         new_password = request.data["new_password"]
@@ -91,13 +94,13 @@ class UserViewSet(viewsets.ModelViewSet):
             user.save()
             return Response("The password was changed", status.HTTP_200_OK)
 
-    @action(methods=['post'], detail=False, serializer_class=FeedbackSerializer, url_path="feedback", permission_classes=[IsUserOwner])
+    @action(methods=['post'], detail=False, serializer_class=FeedbackSerializer, url_path="feedback")
     def feedback(self, request, *args, **kwargs):
         feedback = request.data["feedback"]
         send_notification(config.settings.EMAIL_HOST_USER, f"Feedback from {self.request.user.email}", feedback)
         return Response({"success": True}, status.HTTP_200_OK)
 
-    @action(methods=['post'], detail=False, serializer_class=CheckCodeSerializer, url_path="user-verification", permission_classes=[IsUserOwner])
+    @action(methods=['post'], detail=False, serializer_class=CheckCodeSerializer, url_path="user-verification")
     def verification(self, request, *args, **kwargs):
         code = str(self.request.data["secret_code"])
         user = User.objects.get(verification_code=code)
@@ -112,7 +115,7 @@ class UserViewSet(viewsets.ModelViewSet):
                                                                              "email")
 
     @action(methods=['post'], detail=False, serializer_class=NewVerificationCodeSerializer,
-            url_path="resend_code", permission_classes=[IsUserOwner])
+            url_path="resend_code")
     def resend_code(self, request, *args, **kwargs):
         email = self.request.data["email"]
         password = self.request.data["password"]
