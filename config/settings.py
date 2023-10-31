@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'apps.user',
     'apps.common',
     'apps.tasks',
+    'apps.activity',
 ]
 
 REST_FRAMEWORK = {

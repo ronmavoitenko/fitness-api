@@ -1,9 +1,9 @@
 from rest_framework.routers import DefaultRouter
 
-from apps.tasks.views import TasksViewSet
+from apps.activity.views import ActivityViewSet
 
 router = DefaultRouter(trailing_slash=False)
-router.register(r'tasks', TasksViewSet, basename='task'),
+router.register(r'', ActivityViewSet, basename='activity'),
 
 urlpatterns = [] + router.urls
 
