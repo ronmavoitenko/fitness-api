@@ -12,6 +12,7 @@ class GetTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tasks
         fields = (
+            "id",
             "title",
             "video",
             "duration",

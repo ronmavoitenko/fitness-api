@@ -3,20 +3,17 @@ from apps.activity.models import Activity, Plan, Steps, Foods
 
 
 class ActivitySerializer(serializers.ModelSerializer):
-    calories = serializers.IntegerField()
-    steps = serializers.IntegerField()
 
     class Meta:
         model = Activity
         fields = (
             "id",
-            "calories",
-            "steps",
+            "all_calories",
+            "all_steps",
             "water",
             "sleep",
             "my_tasks",
             "finished_tasks",
-            "user_plan",
         )
 
 
@@ -24,12 +21,11 @@ class CreateActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
         fields = (
-            "steps",
-            "calories",
+            "all_steps",
+            "all_calories",
             "sleep",
             "water",
             "today_date",
-            "user_plan",
             "my_tasks",
             "finished_tasks",
             "started_task",
@@ -39,13 +35,11 @@ class CreateActivitySerializer(serializers.ModelSerializer):
 
 
 class UpdateActivitySerializer(serializers.ModelSerializer):
-    class Mets:
+    class Meta:
         model = Activity
         fields = (
             "sleep",
             "water",
-            "today_date",
-            "finished_tasks",
         )
 
 
@@ -78,6 +72,7 @@ class MyFoodSerializer(serializers.ModelSerializer):
     class Meta:
         model = Foods
         fields = (
+            "id",
             "title",
             "description",
             "calories",
@@ -92,6 +87,5 @@ class CreateStepsSerializer(serializers.ModelSerializer):
             "steps_count",
             "start_time",
             "end_time",
-            "activity",
         )
 

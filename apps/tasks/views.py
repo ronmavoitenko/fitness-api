@@ -7,7 +7,7 @@ from apps.tasks.models import Tasks
 
 class TasksViewSet(viewsets.ModelViewSet):
     serializer_class = TaskSerializer
-    queryset = Tasks.objects.all()
+    queryset = Tasks.objects.all().order_by("id")
 
     def get_serializer_class(self):
         if self.action == "create":

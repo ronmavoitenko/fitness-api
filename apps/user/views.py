@@ -34,10 +34,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         user = serializer.save(username=self.request.data["email"])
         user.set_password(serializer.validated_data['password'])
-        secret_code = generate_code()
-        user.verification_code = secret_code
         user.save()
-        send_notification(user.email, "Your secret key for verification account", f"{secret_code}")
 
     @action(methods=['post'], detail=False, serializer_class=ForgotPasswordSerializer, url_path="forgot-password", permission_classes=[AllowAny])
     def forgot_password(self, *args, **kwargs):

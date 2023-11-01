@@ -1,7 +1,6 @@
 from django.db import models
 from apps.tasks.models import Tasks
 
-
 # Create your models here.
 
 
@@ -15,19 +14,18 @@ class Plan(models.Model):
 
 
 class Activity(models.Model):
-    steps = models.IntegerField(default=0)                                                              # 0
-    calories = models.IntegerField(default=0)                                                           # 0
-    sleep = models.TimeField(null=True)                                                                 # null
-    water = models.FloatField(default=0)                                                                # 0
-    today_date = models.DateTimeField(auto_now=True)                                                    # date now
-    user_plan = models.ForeignKey(Plan, on_delete=models.CASCADE, null=True)                            # plan_id
-    my_tasks = models.ManyToManyField(Tasks, related_name='my_tasks', blank=True)                       # null
-    finished_tasks = models.ManyToManyField(Tasks, related_name='finished_tasks', blank=True)           # null
-    started_task = models.ForeignKey(Tasks, on_delete=models.CASCADE, null=True)                        # null
-    start_task = models.DateTimeField(null=True)                                                        # null
-    end_task = models.DateTimeField(null=True)                                                          # null
-    modified_at = models.DateTimeField(auto_now=True, null=True)                                        # null
-    created_at = models.DateTimeField(auto_now_add=True)                                                # date now
+    all_steps = models.IntegerField(default=0)
+    all_calories = models.IntegerField(default=0)
+    sleep = models.TimeField(default="00:00")
+    water = models.FloatField(default=0)
+    today_date = models.DateTimeField(auto_now=True)
+    my_tasks = models.ManyToManyField(Tasks, related_name='my_tasks', blank=True)
+    finished_tasks = models.ManyToManyField(Tasks, related_name='finished_tasks', blank=True)
+    started_task = models.ForeignKey(Tasks, on_delete=models.CASCADE, null=True)
+    start_task = models.DateTimeField(null=True, blank=True, default=None)
+    end_task = models.DateTimeField(null=True, blank=True, default=None)
+    modified_at = models.DateTimeField(auto_now=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class Steps(models.Model):
@@ -52,7 +50,3 @@ class Foods(models.Model):
     modified_at = models.DateTimeField(auto_now=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-
-
-
-# Add ForeignKey of activity to user, that can be null
