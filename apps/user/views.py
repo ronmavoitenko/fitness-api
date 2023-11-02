@@ -1,4 +1,4 @@
-from django.utils import timezone
+from rest_framework.parsers import MultiPartParser
 from django.contrib.auth import logout
 
 import config.settings
@@ -18,6 +18,7 @@ from rest_framework import viewsets, status
 class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all().order_by("id")
+    parser_classes = [MultiPartParser]
 
     def get_serializer_class(self):
         if self.action == "create":
@@ -68,13 +69,11 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(methods=['post'], detail=False, serializer_class=UpdateProfileSerializer, url_path="update-account")
     def account_update(self, request, *args, **kwargs):
-        request.user.first_name = request.data["first_name"]
-        request.user.last_name = request.data["last_name"]
-        request.user.email = request.data["email"]
-        request.user.phone = request.data["phone"]
-        request.user.birthdate = request.data["birthdate"]
-        request.user.save()
-        return Response({"success": True}, status.HTTP_200_OK)
+        serializer = UpdateProfileSerializer(instance=request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['post'], detail=False, serializer_class=None, url_path="logout")
     def logout(self, request):

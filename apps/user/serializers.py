@@ -51,6 +51,7 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
             "email",
             "phone",
             "birthdate",
+            "profile_image",
         )
 
 
