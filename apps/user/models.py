@@ -8,7 +8,6 @@ class User(AbstractUser):
     phone = models.CharField(max_length=30)
     profile_image = models.FileField(upload_to='media/profile_image', null=True)
     verification_code = models.CharField(max_length=5, null=True)
-    is_verified = models.BooleanField(default=False)
     activity = models.ForeignKey(Activity, on_delete=models.CASCADE, null=True)
     plan = models.ForeignKey(Plan, on_delete=models.CASCADE, null=True)
     modified_at = models.DateTimeField(auto_now=True, null=True)

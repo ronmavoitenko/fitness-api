@@ -14,13 +14,8 @@ class Plan(models.Model):
 
 
 class Activity(models.Model):
-    all_steps = models.IntegerField(default=0)
-    all_calories = models.IntegerField(default=0)
-    sleep = models.TimeField(default="00:00")
-    water = models.FloatField(default=0)
     today_date = models.DateTimeField(auto_now=True)
     my_tasks = models.ManyToManyField(Task, related_name='my_tasks', blank=True)
-    finished_tasks = models.ManyToManyField(Task, related_name='finished_tasks', blank=True)
     started_task = models.ForeignKey(Task, on_delete=models.CASCADE, null=True)
     start_task = models.DateTimeField(null=True, blank=True, default=None)
     end_task = models.DateTimeField(null=True, blank=True, default=None)
