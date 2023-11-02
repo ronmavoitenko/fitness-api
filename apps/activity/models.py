@@ -1,5 +1,5 @@
 from django.db import models
-from apps.tasks.models import Tasks
+from apps.tasks.models import Task
 
 # Create your models here.
 
@@ -19,16 +19,16 @@ class Activity(models.Model):
     sleep = models.TimeField(default="00:00")
     water = models.FloatField(default=0)
     today_date = models.DateTimeField(auto_now=True)
-    my_tasks = models.ManyToManyField(Tasks, related_name='my_tasks', blank=True)
-    finished_tasks = models.ManyToManyField(Tasks, related_name='finished_tasks', blank=True)
-    started_task = models.ForeignKey(Tasks, on_delete=models.CASCADE, null=True)
+    my_tasks = models.ManyToManyField(Task, related_name='my_tasks', blank=True)
+    finished_tasks = models.ManyToManyField(Task, related_name='finished_tasks', blank=True)
+    started_task = models.ForeignKey(Task, on_delete=models.CASCADE, null=True)
     start_task = models.DateTimeField(null=True, blank=True, default=None)
     end_task = models.DateTimeField(null=True, blank=True, default=None)
     modified_at = models.DateTimeField(auto_now=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-class Steps(models.Model):
+class Step(models.Model):
     distance = models.FloatField()
     steps_count = models.IntegerField()
     start_time = models.TimeField(null=True)
@@ -38,7 +38,7 @@ class Steps(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-class Foods(models.Model):
+class Food(models.Model):
     title = models.CharField(max_length=150)
     description = models.CharField(max_length=150)
     grams = models.IntegerField()

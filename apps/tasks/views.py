@@ -3,11 +3,11 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.parsers import MultiPartParser
 
 from apps.tasks.serializers import TaskSerializer, GetTaskSerializer, CreateTaskSerializer
-from apps.tasks.models import Tasks
+from apps.tasks.models import Task
 
 
 class TasksViewSet(viewsets.ModelViewSet):
-    queryset = Tasks.objects.all().order_by("id")
+    queryset = Task.objects.all().order_by("id")
     parser_classes = [MultiPartParser]
 
     def get_serializer_class(self):

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.activity.models import Activity, Plan, Steps, Foods
+from apps.activity.models import Activity, Plan, Step, Food
 
 
 class ActivitySerializer(serializers.ModelSerializer):
@@ -56,7 +56,7 @@ class CreatePlanSerializer(serializers.ModelSerializer):
 
 class CreateFoodSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Foods
+        model = Food
         fields = (
             "title",
             "description",
@@ -70,7 +70,7 @@ class CreateFoodSerializer(serializers.ModelSerializer):
 
 class MyFoodSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Foods
+        model = Food
         fields = (
             "id",
             "title",
@@ -81,7 +81,7 @@ class MyFoodSerializer(serializers.ModelSerializer):
 
 class CreateStepsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Steps
+        model = Step
         fields = (
             "distance",
             "steps_count",

@@ -6,8 +6,8 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from apps.tasks.models import Tasks
-from apps.activity.models import Activity, Plan, Steps, Foods
+from apps.tasks.models import Task
+from apps.activity.models import Activity, Plan, Step, Food
 from apps.activity.serializers import ActivitySerializer, CreatePlanSerializer, CreateFoodSerializer, \
     CreateStepsSerializer, MyFoodSerializer, CreateActivitySerializer, UpdateActivitySerializer
 from apps.tasks.serializers import TaskSerializer
@@ -41,7 +41,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
         if self.action == "my_tasks":
             return self.request.user.activity.my_tasks.all().order_by("id")
         if self.action == "foods":
-            return Foods.objects.filter(activity=self.request.user.activity).order_by("id")
+            return Food.objects.filter(activity=self.request.user.activity).order_by("id")
 
         return queryset
 
@@ -55,9 +55,9 @@ class ActivityViewSet(viewsets.ModelViewSet):
         activity = self.request.user.activity
         activity.sleep = request.data["sleep"]
         activity.water = request.data["water"]
-        total_calories = Foods.objects.filter(activity=activity, created_at__date=timezone.now().date()).aggregate(total_calories=Sum('calories'))[
+        total_calories = Food.objects.filter(activity=activity, created_at__date=timezone.now().date()).aggregate(total_calories=Sum('calories'))[
             'total_calories']
-        total_steps = Steps.objects.filter(activity=activity, created_at__date=timezone.now().date()).aggregate(total_steps=Sum('steps_count'))['total_steps']
+        total_steps = Step.objects.filter(activity=activity, created_at__date=timezone.now().date()).aggregate(total_steps=Sum('steps_count'))['total_steps']
         activity.all_steps = total_steps
         activity.all_calories = total_calories
         activity.save()
@@ -107,7 +107,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
     @action(methods=['delete'], detail=True, serializer_class=None, url_path="delete-food")
     def delete_food(self, *args, **kwargs):
         food_id = kwargs.get("pk")
-        food = Foods.objects.get(id=food_id)
+        food = Food.objects.get(id=food_id)
         food.delete()
         return Response({"success": True}, status.HTTP_200_OK)
 
@@ -122,7 +122,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
         steps_count = request.data["steps_count"]
         start_time = request.data["start_time"]
         end_time = request.data["end_time"]
-        Steps.objects.create(distance=distance, steps_count=steps_count, start_time=start_time, end_time=end_time, activity=activity)
+        Step.objects.create(distance=distance, steps_count=steps_count, start_time=start_time, end_time=end_time, activity=activity)
         return Response({"success": True}, status.HTTP_201_CREATED)
 
     @action(methods=['get'], detail=False, serializer_class=None, url_path="my-tasks")
@@ -131,7 +131,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
 
     @action(methods=['get'], detail=True, serializer_class=None, url_path="add-to-my-tasks")
     def add_to_my_tasks(self, *args, **kwargs):
-        task = Tasks.objects.get(id=kwargs.get("pk"))
+        task = Task.objects.get(id=kwargs.get("pk"))
         activity = Activity.objects.get(id=self.request.user.activity.id)
         activity.my_tasks.add(task)
         activity.save()
@@ -139,7 +139,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
 
     @action(methods=['get'], detail=True, serializer_class=None, url_path="delete-from-my-tasks")
     def delete_from_my_tasks(self, *args, **kwargs):
-        task = Tasks.objects.get(id=kwargs.get("pk"))
+        task = Task.objects.get(id=kwargs.get("pk"))
         activity = Activity.objects.get(id=self.request.user.activity.id)
         activity.my_tasks.remove(task)
         activity.save()
@@ -147,7 +147,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
 
     @action(methods=['get'], detail=True, serializer_class=None, url_path="start-task")
     def start_task(self, *args, **kwargs):
-        task = Tasks.objects.get(id=kwargs.get("pk"))
+        task = Task.objects.get(id=kwargs.get("pk"))
         activity = self.request.user.activity
         task_exists = activity.my_tasks.filter(id=task.id).exists()
         if task_exists:
