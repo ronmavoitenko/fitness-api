@@ -1,91 +1,30 @@
 from rest_framework import serializers
-from apps.activity.models import Activity, Plan, Step, Food
 
 
 class ActivitySerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Activity
-        fields = (
-            "id",
-            "all_calories",
-            "all_steps",
-            "water",
-            "sleep",
-            "my_tasks",
-            "finished_tasks",
-        )
+    pass
 
 
 class CreateActivitySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Activity
-        fields = (
-            "all_steps",
-            "all_calories",
-            "sleep",
-            "water",
-            "today_date",
-            "my_tasks",
-            "finished_tasks",
-            "started_task",
-            "start_task",
-            "end_task",
-        )
+    pass
 
 
 class UpdateActivitySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Activity
-        fields = (
-            "sleep",
-            "water",
-        )
+    pass
 
 
 class CreatePlanSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Plan
-        fields = (
-            "calories",
-            "steps",
-            "water",
-            "sleep",
-        )
+    pass
 
 
 class CreateFoodSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Food
-        fields = (
-            "title",
-            "description",
-            "grams",
-            "fats",
-            "carbs",
-            "proteins",
-            "calories",
-        )
+    pass
 
 
 class MyFoodSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Food
-        fields = (
-            "id",
-            "title",
-            "description",
-            "calories",
-        )
+    pass
 
 
 class CreateStepsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Step
-        fields = (
-            "distance",
-            "steps_count",
-            "start_time",
-            "end_time",
-        )
+    pass
 
