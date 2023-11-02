@@ -36,11 +36,12 @@ class ActivityViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-
+        if getattr(self, "swagger_fake_view", False):
+            return Activity.objects.none()
         if self.action == "my_tasks":
-            return self.request.user.activity.my_tasks.all()
+            return self.request.user.activity.my_tasks.all().order_by("id")
         if self.action == "foods":
-            return Foods.objects.filter(activity=self.request.user.activity)
+            return Foods.objects.filter(activity=self.request.user.activity).order_by("id")
 
         return queryset
 
