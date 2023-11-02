@@ -16,7 +16,6 @@ from rest_framework import viewsets, status
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    serializer_class = UserSerializer
     queryset = User.objects.all().order_by("id")
     parser_classes = [MultiPartParser]
 
@@ -25,7 +24,9 @@ class UserViewSet(viewsets.ModelViewSet):
             return CreateUserSerializer
         if self.action == "forgot_password":
             return ForgotPasswordSerializer
-        return super().get_serializer_class()
+        if self.action == "list":
+            return UserSerializer
+        return UserSerializer
 
     def get_permissions(self):
         if self.action == 'create':

@@ -14,7 +14,6 @@ from apps.tasks.serializers import TaskSerializer
 
 
 class ActivityViewSet(viewsets.ModelViewSet):
-    serializer_class = ActivitySerializer
     queryset = Activity.objects.all().order_by("id")
 
     def get_serializer_class(self):
@@ -30,15 +29,14 @@ class ActivityViewSet(viewsets.ModelViewSet):
             return TaskSerializer
         if self.action == "foods":
             return MyFoodSerializer
-        if self.action == "list":
-            return ActivitySerializer
         if self.action == "update_activity":
             return UpdateActivitySerializer
 
-        return super().get_serializer_class()
+        return ActivitySerializer
 
     def get_queryset(self):
         queryset = super().get_queryset()
+
         if self.action == "my_tasks":
             return self.request.user.activity.my_tasks.all()
         if self.action == "foods":

@@ -7,7 +7,6 @@ from apps.tasks.models import Tasks
 
 
 class TasksViewSet(viewsets.ModelViewSet):
-    serializer_class = TaskSerializer
     queryset = Tasks.objects.all().order_by("id")
     parser_classes = [MultiPartParser]
 
@@ -16,6 +15,7 @@ class TasksViewSet(viewsets.ModelViewSet):
             return CreateTaskSerializer
         if self.action == "list":
             return GetTaskSerializer
+        return TaskSerializer
 
     def get_permissions(self):
         if self.request.method == 'POST':
