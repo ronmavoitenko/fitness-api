@@ -7,7 +7,6 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from apps.tasks.models import Tasks
-from apps.user.models import User
 from apps.activity.models import Activity, Plan, Steps, Foods
 from apps.activity.serializers import ActivitySerializer, CreatePlanSerializer, CreateFoodSerializer, \
     CreateStepsSerializer, MyFoodSerializer, CreateActivitySerializer, UpdateActivitySerializer
@@ -106,7 +105,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
         serializer.save(activity=activity)
         return Response({"success": True}, status.HTTP_201_CREATED)
 
-    @action(methods=['delete'], detail=True, serializer_class=None, url_path="delete_food")
+    @action(methods=['delete'], detail=True, serializer_class=None, url_path="delete-food")
     def delete_food(self, *args, **kwargs):
         food_id = kwargs.get("pk")
         food = Foods.objects.get(id=food_id)
