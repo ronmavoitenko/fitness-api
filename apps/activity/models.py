@@ -14,7 +14,6 @@ class Plan(models.Model):
 
 
 class Activity(models.Model):
-    today_date = models.DateTimeField(auto_now=True)
     my_tasks = models.ManyToManyField(Task, related_name='my_tasks', blank=True)
     started_task = models.ForeignKey(Task, on_delete=models.CASCADE, null=True)
     start_task = models.DateTimeField(null=True, blank=True, default=None)
