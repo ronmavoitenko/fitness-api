@@ -28,6 +28,5 @@ class CreateTaskSerializer(serializers.ModelSerializer):
             "description",
             "video",
             "duration",
-            "break_time",
             "calories",
         )

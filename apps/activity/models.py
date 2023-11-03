@@ -5,10 +5,10 @@ from apps.tasks.models import Task
 
 
 class Plan(models.Model):
-    calories = models.IntegerField()
-    steps = models.IntegerField()
-    sleep = models.TimeField()
-    water = models.FloatField()
+    plan_calories = models.IntegerField()
+    plan_steps = models.IntegerField()
+    plan_sleep = models.TimeField()
+    plan_water = models.FloatField()
     my_tasks = models.ManyToManyField(Task, related_name='my_tasks', blank=True)
     started_task = models.ForeignKey(Task, on_delete=models.CASCADE, null=True)
     start_task = models.DateTimeField(null=True, blank=True, default=None)
@@ -17,21 +17,21 @@ class Plan(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-class SleepActivity(models.Model):
+class Sleep(models.Model):
     sleep = models.TimeField()
     plan = models.ForeignKey(Plan, on_delete=models.CASCADE, null=True)
     modified_at = models.DateTimeField(auto_now=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-class WaterActivity(models.Model):
+class Water(models.Model):
     water = models.FloatField()
     plan = models.ForeignKey(Plan, on_delete=models.CASCADE, null=True)
     modified_at = models.DateTimeField(auto_now=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-class StepActivity(models.Model):
+class Step(models.Model):
     distance = models.FloatField()
     steps_count = models.IntegerField()
     start_time = models.TimeField(null=True)
@@ -41,7 +41,7 @@ class StepActivity(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-class FoodActivity(models.Model):
+class Food(models.Model):
     title = models.CharField(max_length=150)
     description = models.CharField(max_length=150)
     grams = models.IntegerField()
@@ -52,4 +52,3 @@ class FoodActivity(models.Model):
     plan = models.ForeignKey(Plan, on_delete=models.CASCADE, null=True)
     modified_at = models.DateTimeField(auto_now=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
