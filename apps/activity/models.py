@@ -9,11 +9,6 @@ class Plan(models.Model):
     steps = models.IntegerField()
     sleep = models.TimeField()
     water = models.FloatField()
-    modified_at = models.DateTimeField(auto_now=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-
-class Activity(models.Model):
     my_tasks = models.ManyToManyField(Task, related_name='my_tasks', blank=True)
     started_task = models.ForeignKey(Task, on_delete=models.CASCADE, null=True)
     start_task = models.DateTimeField(null=True, blank=True, default=None)
@@ -22,17 +17,31 @@ class Activity(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-class Step(models.Model):
-    distance = models.FloatField()
-    steps_count = models.IntegerField()
-    start_time = models.TimeField(null=True)
-    end_time = models.TimeField(null=True)
-    activity = models.ForeignKey(Activity, on_delete=models.CASCADE, null=True)
+class SleepActivity(models.Model):
+    sleep = models.TimeField()
+    plan = models.ForeignKey(Plan, on_delete=models.CASCADE, null=True)
     modified_at = models.DateTimeField(auto_now=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-class Food(models.Model):
+class WaterActivity(models.Model):
+    water = models.FloatField()
+    plan = models.ForeignKey(Plan, on_delete=models.CASCADE, null=True)
+    modified_at = models.DateTimeField(auto_now=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class StepActivity(models.Model):
+    distance = models.FloatField()
+    steps_count = models.IntegerField()
+    start_time = models.TimeField(null=True)
+    end_time = models.TimeField(null=True)
+    plan = models.ForeignKey(Plan, on_delete=models.CASCADE, null=True)
+    modified_at = models.DateTimeField(auto_now=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class FoodActivity(models.Model):
     title = models.CharField(max_length=150)
     description = models.CharField(max_length=150)
     grams = models.IntegerField()
@@ -40,7 +49,7 @@ class Food(models.Model):
     carbs = models.IntegerField()
     proteins = models.IntegerField()
     calories = models.IntegerField()
-    activity = models.ForeignKey(Activity, on_delete=models.CASCADE, null=True)
+    plan = models.ForeignKey(Plan, on_delete=models.CASCADE, null=True)
     modified_at = models.DateTimeField(auto_now=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
