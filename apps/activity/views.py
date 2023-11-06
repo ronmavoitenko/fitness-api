@@ -9,7 +9,7 @@ from rest_framework.response import Response
 
 from apps.tasks.models import Task
 from apps.tasks.serializers import GetTaskSerializer
-from apps.activity.models import Plan, ActivitySleep, ActivityWater, ActivityFood
+from apps.activity.models import Plan, ActivitySleep, ActivityWater, ActivityFood, ActivityStep
 from apps.activity.serializers import PlanSerializer, SleepSerializer, WaterSerializer, CreateFoodSerializer,\
     CreateStepsSerializer, GetAllStepsSerializer, GetAllCaloriesSerializer
 
@@ -28,6 +28,8 @@ class PlanViewSet(viewsets.ModelViewSet):
             return self.request.user.plan.tasks.all().order_by("id")
         if self.action == "foods":
             return ActivityFood.objects.filter(plan=self.request.user.plan).order_by("id")
+        if self.action == "get_steps_logs":
+            return ActivityStep.objects.filter(plan=self.request.user.plan).order_by("id")
 
         return queryset
 
@@ -36,7 +38,7 @@ class PlanViewSet(viewsets.ModelViewSet):
         self.request.user.plan = plan
         self.request.user.save()
 
-    @action(methods=['post'], detail=False, serializer_class=PlanSerializer, url_path="change-plan")
+    @action(methods=['post'], detail=False, serializer_class=PlanSerializer, url_path="change")
     def change_plan(self, request, *args, **kwargs):
         plan = Plan.objects.get(id=request.user.plan.id)
         plan.steps = request.data["steps"]
@@ -79,7 +81,7 @@ class PlanViewSet(viewsets.ModelViewSet):
     def foods(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
-    @action(methods=['get'], detail=False, serializer_class=GetAllCaloriesSerializer, url_path="all-calories")
+    @action(methods=['get'], detail=False, serializer_class=GetAllCaloriesSerializer, url_path="calories")
     def get_all_calories(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -94,18 +96,22 @@ class PlanViewSet(viewsets.ModelViewSet):
         serializer.save(plan=plan)
         return Response({"success": True}, status.HTTP_201_CREATED)
 
-    @action(methods=['get'], detail=False, serializer_class=GetAllStepsSerializer, url_path="all-steps")
+    @action(methods=['get'], detail=False, serializer_class=GetAllStepsSerializer, url_path="steps")
     def get_all_steps(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         total_steps = serializer.data['all_steps']
         return Response({'all_steps': total_steps}, status=status.HTTP_200_OK)
 
-    @action(methods=['get'], detail=False, serializer_class=GetTaskSerializer, url_path="my-tasks")
+    @action(methods=['get'], detail=False, serializer_class=CreateStepsSerializer, url_path="steps-logs")
+    def get_steps_logs(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @action(methods=['get'], detail=False, serializer_class=GetTaskSerializer, url_path="tasks")
     def my_tasks(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
-    @action(methods=['get'], detail=True, serializer_class=None, url_path="add-to-my-tasks")
+    @action(methods=['get'], detail=True, serializer_class=None, url_path="add-to-tasks")
     def add_to_my_tasks(self, *args, **kwargs):
         task = get_object_or_404(Task, pk=kwargs.get("pk"))
         plan = self.request.user.plan
@@ -113,7 +119,7 @@ class PlanViewSet(viewsets.ModelViewSet):
         plan.save()
         return Response({"success": True}, status.HTTP_200_OK)
 
-    @action(methods=['get'], detail=True, serializer_class=None, url_path="delete-from-my-tasks")
+    @action(methods=['get'], detail=True, serializer_class=None, url_path="delete-from-tasks")
     def delete_from_my_tasks(self, *args, **kwargs):
         task = get_object_or_404(Task, pk=kwargs.get("pk"))
         plan = self.request.user.plan

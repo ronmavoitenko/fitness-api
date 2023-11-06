@@ -104,5 +104,5 @@ class GetAllStepsSerializer(serializers.ModelSerializer):
     def get_all_steps(self, obj):
         plan = self.context["request"].user.plan
         total_steps = ActivityStep.objects.filter(plan=plan, created_at__date=timezone.now().date()).values('plan') \
-            .annotate(total_calories=Sum('steps_count'))
+            .annotate(total_steps=Sum('steps_count'))
         return total_steps
