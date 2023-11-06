@@ -18,15 +18,7 @@ from rest_framework import viewsets, status
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by("id")
     parser_classes = [MultiPartParser]
-
-    def get_serializer_class(self):
-        if self.action == "create":
-            return CreateUserSerializer
-        if self.action == "forgot_password":
-            return ForgotPasswordSerializer
-        if self.action == "list":
-            return UserSerializer
-        return UserSerializer
+    serializer_class = CreateUserSerializer
 
     def get_permissions(self):
         if self.action == 'create':
@@ -51,7 +43,7 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(methods=['post'], detail=False, serializer_class=CheckCodeSerializer, url_path="verify-code", permission_classes=[AllowAny])
     def verify_code(self, request, *args, **kwargs):
         code = str(self.request.data["secret_code"])
-        user = User.objects.get(verification_code=code)
+        user = User.objects.filter(verification_code=code)
         if user:
             return Response({"success": True}, status.HTTP_200_OK)
         else:
