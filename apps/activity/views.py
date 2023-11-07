@@ -26,10 +26,6 @@ class PlanViewSet(viewsets.ModelViewSet):
             return Plan.objects.none()
         if self.action == "my_tasks":
             return self.request.user.plan.tasks.all().order_by("id")
-        if self.action == "foods":
-            return ActivityFood.objects.filter(plan=self.request.user.plan).order_by("id")
-        if self.action == "get_steps_logs":
-            return ActivityStep.objects.filter(plan=self.request.user.plan).order_by("id")
 
         return queryset
 
@@ -48,21 +44,21 @@ class PlanViewSet(viewsets.ModelViewSet):
         plan.save()
         return Response({"success": True}, status.HTTP_200_OK)
 
-    @action(methods=['post'], detail=False, serializer_class=SleepSerializer, url_path="create-sleep")
+    @action(methods=['post'], detail=False, serializer_class=SleepSerializer, url_path="sleep")
     def create_sleep(self, request, *args, **kwargs):
         sleep = request.data["sleep"]
         plan = self.request.user.plan
         ActivitySleep.objects.create(sleep=sleep, plan=plan)
         return Response({"success": True}, status.HTTP_201_CREATED)
 
-    @action(methods=['post'], detail=False, serializer_class=WaterSerializer, url_path="create-water")
+    @action(methods=['post'], detail=False, serializer_class=WaterSerializer, url_path="water")
     def create_water(self, request, *args, **kwargs):
         sleep = request.data["water"]
         plan = self.request.user.plan
         ActivityWater.objects.create(water=sleep, plan=plan)
         return Response({"success": True}, status.HTTP_201_CREATED)
 
-    @action(methods=['post'], detail=False, serializer_class=CreateFoodSerializer, url_path="create-food")
+    @action(methods=['post'], detail=False, serializer_class=CreateFoodSerializer, url_path="food")
     def create_food(self, request, *args, **kwargs):
         plan = self.request.user.plan
         serializer = self.get_serializer(data=request.data)
@@ -77,18 +73,20 @@ class PlanViewSet(viewsets.ModelViewSet):
         food.delete()
         return Response({"success": True}, status.HTTP_200_OK)
 
-    @action(methods=['get'], detail=False, serializer_class=CreateFoodSerializer, url_path="foods")
-    def foods(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
-
     @action(methods=['get'], detail=False, serializer_class=GetAllCaloriesSerializer, url_path="calories")
-    def get_all_calories(self, request, *args, **kwargs):
+    def foods(self, request, *args, **kwargs):
+        foods = ActivityFood.objects.filter(plan=self.request.user.plan, created_at__date=timezone.now()).order_by("-id")
+        foods_serializer = CreateFoodSerializer(foods, many=True)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         total_calories = serializer.data['all_calories']
-        return Response({'all_calories': total_calories}, status=status.HTTP_200_OK)
+        response_data = {
+            'all_calories': total_calories,
+            'foods': foods_serializer.data
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
 
-    @action(methods=['post'], detail=False, serializer_class=CreateStepsSerializer, url_path="create-step")
+    @action(methods=['post'], detail=False, serializer_class=CreateStepsSerializer, url_path="step")
     def create_step(self, request, *args, **kwargs):
         plan = self.request.user.plan
         serializer = self.get_serializer(data=request.data)
@@ -97,15 +95,17 @@ class PlanViewSet(viewsets.ModelViewSet):
         return Response({"success": True}, status.HTTP_201_CREATED)
 
     @action(methods=['get'], detail=False, serializer_class=GetAllStepsSerializer, url_path="steps")
-    def get_all_steps(self, request, *args, **kwargs):
+    def steps(self, request, *args, **kwargs):
+        steps = ActivityStep.objects.filter(plan=self.request.user.plan, created_at__date=timezone.now()).order_by("-id")
+        steps_serializer = CreateStepsSerializer(steps, many=True)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         total_steps = serializer.data['all_steps']
-        return Response({'all_steps': total_steps}, status=status.HTTP_200_OK)
-
-    @action(methods=['get'], detail=False, serializer_class=CreateStepsSerializer, url_path="steps-logs")
-    def get_steps_logs(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+        response_data = {
+            'all_steps': total_steps,
+            'steps': steps_serializer.data
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
 
     @action(methods=['get'], detail=False, serializer_class=GetTaskSerializer, url_path="tasks")
     def my_tasks(self, request, *args, **kwargs):

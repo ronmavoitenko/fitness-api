@@ -52,11 +52,13 @@ class CreateFoodSerializer(serializers.ModelSerializer):
 
 class GetAllCaloriesSerializer(serializers.ModelSerializer):
     all_calories = serializers.SerializerMethodField()
+    foods = CreateFoodSerializer(many=True, read_only=True, source="activityfood")
 
     class Meta:
         model = ActivityFood
         fields = (
             "all_calories",
+            "foods",
         )
 
     def get_all_calories(self, obj):
@@ -94,11 +96,13 @@ class CreateStepsSerializer(serializers.ModelSerializer):
 
 class GetAllStepsSerializer(serializers.ModelSerializer):
     all_steps = serializers.SerializerMethodField()
+    steps = CreateStepsSerializer(many=True, read_only=True, source="activitystep")
 
     class Meta:
         model = ActivityStep
         fields = (
             "all_steps",
+            "steps",
         )
 
     def get_all_steps(self, obj):
