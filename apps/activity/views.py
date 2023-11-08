@@ -2,6 +2,7 @@ from datetime import timedelta
 from django.shortcuts import get_object_or_404
 
 from django.utils import timezone
+from drf_yasg.utils import swagger_auto_schema, no_body
 from rest_framework import filters
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -34,7 +35,7 @@ class PlanViewSet(viewsets.ModelViewSet):
         self.request.user.plan = plan
         self.request.user.save()
 
-    @action(methods=['post'], detail=False, serializer_class=PlanSerializer, url_path="change")
+    @action(methods=['patch'], detail=False, serializer_class=PlanSerializer, url_path="change")
     def change_plan(self, request, *args, **kwargs):
         plan = Plan.objects.get(id=request.user.plan.id)
         plan.steps = request.data["steps"]
@@ -111,7 +112,7 @@ class PlanViewSet(viewsets.ModelViewSet):
     def my_tasks(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
-    @action(methods=['get'], detail=True, serializer_class=None, url_path="add-to-tasks")
+    @action(methods=['post'], detail=True, serializer_class=None, url_path="add-to-tasks")
     def add_to_my_tasks(self, *args, **kwargs):
         task = get_object_or_404(Task, pk=kwargs.get("pk"))
         plan = self.request.user.plan
@@ -119,7 +120,7 @@ class PlanViewSet(viewsets.ModelViewSet):
         plan.save()
         return Response({"success": True}, status.HTTP_200_OK)
 
-    @action(methods=['get'], detail=True, serializer_class=None, url_path="delete-from-tasks")
+    @action(methods=['delete'], detail=True, serializer_class=None, url_path="delete-from-tasks")
     def delete_from_my_tasks(self, *args, **kwargs):
         task = get_object_or_404(Task, pk=kwargs.get("pk"))
         plan = self.request.user.plan
@@ -127,7 +128,8 @@ class PlanViewSet(viewsets.ModelViewSet):
         plan.save()
         return Response({"success": True}, status.HTTP_200_OK)
 
-    @action(methods=['get'], detail=True, serializer_class=None, url_path="start-task")
+    @swagger_auto_schema(request_body=no_body)
+    @action(methods=['put'], detail=True, serializer_class=None, url_path="start-task")
     def start_task(self, *args, **kwargs):
         task = Task.objects.get(id=kwargs.get("pk"))
         plan = self.request.user.plan
@@ -139,7 +141,8 @@ class PlanViewSet(viewsets.ModelViewSet):
             return Response({"success": True}, status.HTTP_200_OK)
         return Response({"success": False}, status.HTTP_200_OK)
 
-    @action(methods=['get'], detail=False, serializer_class=None, url_path="continue-task")
+    @swagger_auto_schema(request_body=no_body)
+    @action(methods=['put'], detail=False, serializer_class=None, url_path="continue-task")
     def continue_task(self, *args, **kwargs):
         plan = self.request.user.plan
         task = plan.started_task
@@ -150,7 +153,8 @@ class PlanViewSet(viewsets.ModelViewSet):
             plan.save()
         return Response({"success": True}, status.HTTP_200_OK)
 
-    @action(methods=['get'], detail=False, serializer_class=None, url_path="cancel-task")
+    @swagger_auto_schema(request_body=no_body)
+    @action(methods=['put'], detail=False, serializer_class=None, url_path="cancel-task")
     def cancel_task(self, *args, **kwargs):
         plan = self.request.user.plan
         plan.start_task = None
@@ -159,7 +163,8 @@ class PlanViewSet(viewsets.ModelViewSet):
         plan.save()
         return Response({"success": True}, status.HTTP_200_OK)
 
-    @action(methods=['get'], detail=False, serializer_class=None, url_path="stop-task")
+    @swagger_auto_schema(request_body=no_body)
+    @action(methods=['put'], detail=False, serializer_class=None, url_path="stop-task")
     def stop_task(self, *args, **kwargs):
         plan = self.request.user.plan
         task = plan.started_task
