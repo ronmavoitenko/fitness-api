@@ -25,7 +25,7 @@ class PlanViewSet(viewsets.ModelViewSet):
         queryset = super().get_queryset()
         if getattr(self, "swagger_fake_view", False):
             return Plan.objects.none()
-        if self.action == "my_tasks":
+        if self.action == "tasks":
             return self.request.user.plan.tasks.all().order_by("id")
 
         return queryset
@@ -36,7 +36,7 @@ class PlanViewSet(viewsets.ModelViewSet):
         self.request.user.save()
 
     @action(methods=['patch'], detail=False, serializer_class=PlanSerializer, url_path="change")
-    def change_plan(self, request, *args, **kwargs):
+    def change(self, request, *args, **kwargs):
         plan = Plan.objects.get(id=request.user.plan.id)
         plan.steps = request.data["steps"]
         plan.calories = request.data["calories"]
@@ -46,21 +46,21 @@ class PlanViewSet(viewsets.ModelViewSet):
         return Response({"success": True}, status.HTTP_200_OK)
 
     @action(methods=['post'], detail=False, serializer_class=SleepSerializer, url_path="sleep")
-    def create_sleep(self, request, *args, **kwargs):
+    def sleep(self, request, *args, **kwargs):
         sleep = request.data["sleep"]
         plan = self.request.user.plan
         ActivitySleep.objects.create(sleep=sleep, plan=plan)
         return Response({"success": True}, status.HTTP_201_CREATED)
 
     @action(methods=['post'], detail=False, serializer_class=WaterSerializer, url_path="water")
-    def create_water(self, request, *args, **kwargs):
+    def water(self, request, *args, **kwargs):
         sleep = request.data["water"]
         plan = self.request.user.plan
         ActivityWater.objects.create(water=sleep, plan=plan)
         return Response({"success": True}, status.HTTP_201_CREATED)
 
     @action(methods=['post'], detail=False, serializer_class=CreateFoodSerializer, url_path="food")
-    def create_food(self, request, *args, **kwargs):
+    def food(self, request, *args, **kwargs):
         plan = self.request.user.plan
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -75,7 +75,7 @@ class PlanViewSet(viewsets.ModelViewSet):
         return Response({"success": True}, status.HTTP_200_OK)
 
     @action(methods=['get'], detail=False, serializer_class=GetAllCaloriesSerializer, url_path="calories")
-    def foods(self, request, *args, **kwargs):
+    def calories(self, request, *args, **kwargs):
         foods = ActivityFood.objects.filter(plan=self.request.user.plan, created_at__date=timezone.now()).order_by("-id")
         foods_serializer = CreateFoodSerializer(foods, many=True)
         serializer = self.get_serializer(data=request.data)
@@ -88,7 +88,7 @@ class PlanViewSet(viewsets.ModelViewSet):
         return Response(response_data, status=status.HTTP_200_OK)
 
     @action(methods=['post'], detail=False, serializer_class=CreateStepsSerializer, url_path="step")
-    def create_step(self, request, *args, **kwargs):
+    def step(self, request, *args, **kwargs):
         plan = self.request.user.plan
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -109,19 +109,19 @@ class PlanViewSet(viewsets.ModelViewSet):
         return Response(response_data, status=status.HTTP_200_OK)
 
     @action(methods=['get'], detail=False, serializer_class=GetTaskSerializer, url_path="tasks")
-    def my_tasks(self, request, *args, **kwargs):
+    def tasks(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
-    @action(methods=['post'], detail=True, serializer_class=None, url_path="add-to-tasks")
-    def add_to_my_tasks(self, *args, **kwargs):
+    @action(methods=['post'], detail=True, serializer_class=None, url_path="add-task")
+    def add_task(self, *args, **kwargs):
         task = get_object_or_404(Task, pk=kwargs.get("pk"))
         plan = self.request.user.plan
         plan.tasks.add(task)
         plan.save()
         return Response({"success": True}, status.HTTP_200_OK)
 
-    @action(methods=['delete'], detail=True, serializer_class=None, url_path="delete-from-tasks")
-    def delete_from_my_tasks(self, *args, **kwargs):
+    @action(methods=['delete'], detail=True, serializer_class=None, url_path="delete-task")
+    def delete_task(self, *args, **kwargs):
         task = get_object_or_404(Task, pk=kwargs.get("pk"))
         plan = self.request.user.plan
         plan.tasks.remove(task)
