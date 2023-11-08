@@ -120,6 +120,7 @@ class PlanViewSet(viewsets.ModelViewSet):
         plan.save()
         return Response({"success": True}, status.HTTP_200_OK)
 
+    @swagger_auto_schema(request_body=no_body)
     @action(methods=['delete'], detail=True, serializer_class=None, url_path="delete-task")
     def delete_task(self, *args, **kwargs):
         task = get_object_or_404(Task, pk=kwargs.get("pk"))
