@@ -43,21 +43,27 @@ class PlanViewSet(viewsets.ModelViewSet):
         plan.sleep = request.data["sleep"]
         plan.water = request.data["water"]
         plan.save()
-        return Response({"success": True}, status.HTTP_200_OK)
+        plan_serializer = PlanSerializer(plan)
+        serialized_plan = plan_serializer.data
+        return Response({"plan": serialized_plan}, status.HTTP_200_OK)
 
     @action(methods=['post'], detail=False, serializer_class=SleepSerializer, url_path="sleep")
     def sleep(self, request, *args, **kwargs):
-        sleep = request.data["sleep"]
+        sleep_data = request.data["sleep"]
         plan = self.request.user.plan
-        ActivitySleep.objects.create(sleep=sleep, plan=plan)
-        return Response({"success": True}, status.HTTP_201_CREATED)
+        ActivitySleep.objects.create(sleep=sleep_data, plan=plan)
+        sleep_serializer = self.get_serializer(data=request.data)
+        sleep_serializer.is_valid(raise_exception=True)
+        return Response({"sleep": sleep_serializer.data}, status.HTTP_201_CREATED)
 
     @action(methods=['post'], detail=False, serializer_class=WaterSerializer, url_path="water")
     def water(self, request, *args, **kwargs):
-        sleep = request.data["water"]
+        water_data = request.data["water"]
         plan = self.request.user.plan
-        ActivityWater.objects.create(water=sleep, plan=plan)
-        return Response({"success": True}, status.HTTP_201_CREATED)
+        ActivityWater.objects.create(water=water_data, plan=plan)
+        water_serializer = self.get_serializer(data=request.data)
+        water_serializer.is_valid(raise_exception=True)
+        return Response({"water": water_serializer.data}, status.HTTP_201_CREATED)
 
     @action(methods=['post'], detail=False, serializer_class=CreateFoodSerializer, url_path="food")
     def food(self, request, *args, **kwargs):
@@ -65,12 +71,11 @@ class PlanViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(plan=plan)
-        return Response({"success": True}, status.HTTP_201_CREATED)
+        return Response({"food": serializer.data}, status.HTTP_201_CREATED)
 
     @action(methods=['delete'], detail=True, serializer_class=None, url_path="delete-food")
     def delete_food(self, *args, **kwargs):
-        food_id = kwargs.get("pk")
-        food = ActivityFood.objects.get(id=food_id)
+        food = get_object_or_404(ActivityFood, pk=kwargs.get("pk"))
         food.delete()
         return Response({"success": True}, status.HTTP_200_OK)
 
@@ -93,7 +98,7 @@ class PlanViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(plan=plan)
-        return Response({"success": True}, status.HTTP_201_CREATED)
+        return Response({"step": serializer.data}, status.HTTP_201_CREATED)
 
     @action(methods=['get'], detail=False, serializer_class=GetAllStepsSerializer, url_path="steps")
     def steps(self, request, *args, **kwargs):
@@ -118,7 +123,9 @@ class PlanViewSet(viewsets.ModelViewSet):
         plan = self.request.user.plan
         plan.tasks.add(task)
         plan.save()
-        return Response({"success": True}, status.HTTP_200_OK)
+        plan_serializer = PlanSerializer(plan)
+        serialized_plan = plan_serializer.data
+        return Response({"plan": serialized_plan}, status.HTTP_200_OK)
 
     @swagger_auto_schema(request_body=no_body)
     @action(methods=['delete'], detail=True, serializer_class=None, url_path="delete-task")
@@ -139,8 +146,9 @@ class PlanViewSet(viewsets.ModelViewSet):
             plan.started_task = task
             plan.start_task = timezone.now()
             plan.save()
-            return Response({"success": True}, status.HTTP_200_OK)
-        return Response({"success": False}, status.HTTP_200_OK)
+        plan_serializer = PlanSerializer(plan)
+        serialized_plan = plan_serializer.data
+        return Response({"plan": serialized_plan}, status.HTTP_200_OK)
 
     @swagger_auto_schema(request_body=no_body)
     @action(methods=['put'], detail=False, serializer_class=None, url_path="continue-task")
@@ -166,12 +174,11 @@ class PlanViewSet(viewsets.ModelViewSet):
 
     @swagger_auto_schema(request_body=no_body)
     @action(methods=['put'], detail=False, serializer_class=None, url_path="stop-task")
-    def stop_task(self, *args, **kwargs):
+    def stop_task(self, request, *args, **kwargs):
         plan = self.request.user.plan
         task = plan.started_task
         if task:
             plan.end_task = timezone.now()
-            plan.save()
             time_elapsed = plan.end_task - plan.start_task
             task_duration = timedelta(hours=task.duration.hour, minutes=task.duration.minute)
             if time_elapsed > task_duration:
@@ -179,7 +186,7 @@ class PlanViewSet(viewsets.ModelViewSet):
                 plan.started_task = None
                 plan.end_task = None
                 plan.tasks.remove(task)
-                plan.save()
-                return Response("You finished your task", status.HTTP_200_OK)
-            return Response("Task was stopped", status.HTTP_200_OK)
-        return Response("No one task is started", status.HTTP_200_OK)
+        plan.save()
+        plan_serializer = PlanSerializer(plan)
+        serialized_plan = plan_serializer.data
+        return Response({"plan": serialized_plan}, status.HTTP_200_OK)

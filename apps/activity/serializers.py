@@ -14,6 +14,9 @@ class PlanSerializer(serializers.ModelSerializer):
             "sleep",
             "water",
             "tasks",
+            "started_task",
+            "start_task",
+            "end_task",
         )
 
 
