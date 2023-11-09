@@ -134,7 +134,9 @@ class PlanViewSet(viewsets.ModelViewSet):
         plan = self.request.user.plan
         plan.tasks.remove(task)
         plan.save()
-        return Response({"success": True}, status.HTTP_200_OK)
+        plan_serializer = PlanSerializer(plan)
+        serialized_plan = plan_serializer.data
+        return Response({"plan": serialized_plan}, status.HTTP_200_OK)
 
     @swagger_auto_schema(request_body=no_body)
     @action(methods=['put'], detail=True, serializer_class=None, url_path="start-task")
