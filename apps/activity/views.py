@@ -45,25 +45,23 @@ class PlanViewSet(viewsets.ModelViewSet):
         plan.save()
         plan_serializer = PlanSerializer(plan)
         serialized_plan = plan_serializer.data
-        return Response({"plan": serialized_plan}, status.HTTP_200_OK)
+        return Response(serialized_plan, status.HTTP_200_OK)
 
     @action(methods=['post'], detail=False, serializer_class=SleepSerializer, url_path="sleep")
     def sleep(self, request, *args, **kwargs):
-        sleep_data = request.data["sleep"]
         plan = self.request.user.plan
-        ActivitySleep.objects.create(sleep=sleep_data, plan=plan)
-        sleep_serializer = self.get_serializer(data=request.data)
+        ActivitySleep.objects.create(sleep=request.data["sleep"], plan=plan)
+        sleep_serializer = SleepSerializer(data=request.data)
         sleep_serializer.is_valid(raise_exception=True)
-        return Response({"sleep": sleep_serializer.data}, status.HTTP_201_CREATED)
+        return Response(sleep_serializer.data, status.HTTP_201_CREATED)
 
     @action(methods=['post'], detail=False, serializer_class=WaterSerializer, url_path="water")
     def water(self, request, *args, **kwargs):
-        water_data = request.data["water"]
         plan = self.request.user.plan
-        ActivityWater.objects.create(water=water_data, plan=plan)
-        water_serializer = self.get_serializer(data=request.data)
+        ActivityWater.objects.create(water=request.data["water"], plan=plan)
+        water_serializer = WaterSerializer(data=request.data)
         water_serializer.is_valid(raise_exception=True)
-        return Response({"water": water_serializer.data}, status.HTTP_201_CREATED)
+        return Response(water_serializer.data, status.HTTP_201_CREATED)
 
     @action(methods=['post'], detail=False, serializer_class=CreateFoodSerializer, url_path="food")
     def food(self, request, *args, **kwargs):
@@ -71,7 +69,7 @@ class PlanViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(plan=plan)
-        return Response({"food": serializer.data}, status.HTTP_201_CREATED)
+        return Response(serializer.data, status.HTTP_201_CREATED)
 
     @action(methods=['delete'], detail=True, serializer_class=None, url_path="delete-food")
     def delete_food(self, *args, **kwargs):
@@ -98,7 +96,7 @@ class PlanViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(plan=plan)
-        return Response({"step": serializer.data}, status.HTTP_201_CREATED)
+        return Response(serializer.data, status.HTTP_201_CREATED)
 
     @action(methods=['get'], detail=False, serializer_class=GetAllStepsSerializer, url_path="steps")
     def steps(self, request, *args, **kwargs):
@@ -125,7 +123,7 @@ class PlanViewSet(viewsets.ModelViewSet):
         plan.save()
         plan_serializer = PlanSerializer(plan)
         serialized_plan = plan_serializer.data
-        return Response({"plan": serialized_plan}, status.HTTP_200_OK)
+        return Response(serialized_plan, status.HTTP_200_OK)
 
     @swagger_auto_schema(request_body=no_body)
     @action(methods=['delete'], detail=True, serializer_class=None, url_path="delete-task")
@@ -136,7 +134,7 @@ class PlanViewSet(viewsets.ModelViewSet):
         plan.save()
         plan_serializer = PlanSerializer(plan)
         serialized_plan = plan_serializer.data
-        return Response({"plan": serialized_plan}, status.HTTP_200_OK)
+        return Response(serialized_plan, status.HTTP_200_OK)
 
     @swagger_auto_schema(request_body=no_body)
     @action(methods=['put'], detail=True, serializer_class=None, url_path="start-task")
@@ -150,7 +148,7 @@ class PlanViewSet(viewsets.ModelViewSet):
             plan.save()
         plan_serializer = PlanSerializer(plan)
         serialized_plan = plan_serializer.data
-        return Response({"plan": serialized_plan}, status.HTTP_200_OK)
+        return Response(serialized_plan, status.HTTP_200_OK)
 
     @swagger_auto_schema(request_body=no_body)
     @action(methods=['put'], detail=False, serializer_class=None, url_path="continue-task")
@@ -191,4 +189,4 @@ class PlanViewSet(viewsets.ModelViewSet):
         plan.save()
         plan_serializer = PlanSerializer(plan)
         serialized_plan = plan_serializer.data
-        return Response({"plan": serialized_plan}, status.HTTP_200_OK)
+        return Response(serialized_plan, status.HTTP_200_OK)
