@@ -160,7 +160,9 @@ class PlanViewSet(viewsets.ModelViewSet):
         if time_elapsed < task_duration:
             plan.end_task = None
             plan.save()
-        return Response({"success": True}, status.HTTP_200_OK)
+        plan_serializer = PlanSerializer(plan)
+        serialized_plan = plan_serializer.data
+        return Response(serialized_plan, status.HTTP_200_OK)
 
     @swagger_auto_schema(request_body=no_body)
     @action(methods=['put'], detail=False, serializer_class=None, url_path="cancel-task")
@@ -170,7 +172,9 @@ class PlanViewSet(viewsets.ModelViewSet):
         plan.end_task = None
         plan.started_task = None
         plan.save()
-        return Response({"success": True}, status.HTTP_200_OK)
+        plan_serializer = PlanSerializer(plan)
+        serialized_plan = plan_serializer.data
+        return Response(serialized_plan, status.HTTP_200_OK)
 
     @swagger_auto_schema(request_body=no_body)
     @action(methods=['put'], detail=False, serializer_class=None, url_path="stop-task")
