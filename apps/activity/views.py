@@ -10,7 +10,7 @@ from rest_framework.response import Response
 
 from apps.tasks.models import Task
 from apps.tasks.serializers import GetTaskSerializer
-from apps.activity.models import Plan, ActivitySleep, ActivityWater, ActivityFood, ActivityStep
+from apps.activity.models import Plan, ActivityFood, ActivityStep
 from apps.activity.serializers import PlanSerializer, SleepSerializer, WaterSerializer, CreateFoodSerializer,\
     CreateStepsSerializer, GetAllStepsSerializer, GetAllCaloriesSerializer
 
