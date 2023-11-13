@@ -47,26 +47,23 @@ class PlanViewSet(viewsets.ModelViewSet):
 
     @action(methods=['post'], detail=False, serializer_class=SleepSerializer, url_path="sleep")
     def sleep(self, request, *args, **kwargs):
-        plan = self.request.user.plan
-        ActivitySleep.objects.create(sleep=request.data["sleep"], plan=plan)
+        ActivitySleep.objects.create(sleep=request.data["sleep"], plan=self.request.user.plan)
         sleep_serializer = SleepSerializer(data=request.data)
         sleep_serializer.is_valid(raise_exception=True)
         return Response(sleep_serializer.data, status.HTTP_201_CREATED)
 
     @action(methods=['post'], detail=False, serializer_class=WaterSerializer, url_path="water")
     def water(self, request, *args, **kwargs):
-        plan = self.request.user.plan
-        ActivityWater.objects.create(water=request.data["water"], plan=plan)
+        ActivityWater.objects.create(water=request.data["water"], plan=self.request.user.plan)
         water_serializer = WaterSerializer(data=request.data)
         water_serializer.is_valid(raise_exception=True)
         return Response(water_serializer.data, status.HTTP_201_CREATED)
 
     @action(methods=['post'], detail=False, serializer_class=CreateFoodSerializer, url_path="food")
     def food(self, request, *args, **kwargs):
-        plan = self.request.user.plan
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(plan=plan)
+        serializer.save(plan=self.request.user.plan)
         return Response(serializer.data, status.HTTP_201_CREATED)
 
     @action(methods=['delete'], detail=True, serializer_class=None, url_path="delete-food")
@@ -88,10 +85,9 @@ class PlanViewSet(viewsets.ModelViewSet):
 
     @action(methods=['post'], detail=False, serializer_class=CreateStepsSerializer, url_path="step")
     def step(self, request, *args, **kwargs):
-        plan = self.request.user.plan
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(plan=plan)
+        serializer.save(plan=self.request.user.plan)
         return Response(serializer.data, status.HTTP_201_CREATED)
 
     @action(methods=['get'], detail=False, serializer_class=GetAllStepsSerializer, url_path="steps")
