@@ -131,8 +131,7 @@ class PlanViewSet(viewsets.ModelViewSet):
     def start_task(self, *args, **kwargs):
         task = get_object_or_404(Task, id=kwargs.get("pk"))
         plan = self.request.user.plan
-        task_exists = plan.tasks.filter(id=task.id).exists()
-        if task_exists:
+        if plan.tasks.filter(id=task.id).exists():
             plan.started_task = task
             plan.start_task = timezone.now()
             plan.save()
@@ -143,8 +142,7 @@ class PlanViewSet(viewsets.ModelViewSet):
     def continue_task(self, *args, **kwargs):
         plan = self.request.user.plan
         task_duration = timedelta(hours=plan.started_task.duration.hour, minutes=plan.started_task.duration.minute)
-        time_elapsed = plan.end_task - plan.start_task
-        if time_elapsed < task_duration:
+        if plan.end_task - plan.start_task < task_duration:
             plan.end_task = None
             plan.save()
         return Response(PlanSerializer(plan).data, status.HTTP_200_OK)
@@ -163,9 +161,8 @@ class PlanViewSet(viewsets.ModelViewSet):
         plan = self.request.user.plan
         if plan.started_task:
             plan.end_task = timezone.now()
-            time_elapsed = plan.end_task - plan.start_task
             task_duration = timedelta(hours=plan.started_task.duration.hour, minutes=plan.started_task.duration.minute)
-            if time_elapsed > task_duration:
+            if plan.end_task - plan.start_task > task_duration:
                 plan.start_task = plan.started_task = plan.end_task = None
                 plan.tasks.remove(plan.started_task)
         plan.save()
