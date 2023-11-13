@@ -159,7 +159,7 @@ class PlanViewSet(viewsets.ModelViewSet):
 
     @swagger_auto_schema(request_body=no_body)
     @action(methods=['put'], detail=False, serializer_class=None, url_path="stop-task")
-    def stop_task(self, request, *args, **kwargs):
+    def stop_task(self, *args, **kwargs):
         plan = self.request.user.plan
         if plan.started_task:
             plan.end_task = timezone.now()
