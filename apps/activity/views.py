@@ -70,7 +70,7 @@ class PlanViewSet(viewsets.ModelViewSet):
     def delete_food(self, *args, **kwargs):
         food = get_object_or_404(ActivityFood, pk=kwargs.get("pk"))
         food.delete()
-        return Response({"success": True}, status.HTTP_204_NO_CONTENT)
+        return Response(status.HTTP_204_NO_CONTENT)
 
     @action(methods=['get'], detail=False, serializer_class=GetAllCaloriesSerializer, url_path="calories")
     def calories(self, request, *args, **kwargs):
@@ -110,7 +110,6 @@ class PlanViewSet(viewsets.ModelViewSet):
         task = get_object_or_404(Task, pk=kwargs.get("pk"))
         plan = self.request.user.plan
         plan.tasks.add(task)
-        plan.save()
         return Response(PlanSerializer(plan).data, status.HTTP_200_OK)
 
     @swagger_auto_schema(request_body=no_body)
@@ -119,8 +118,7 @@ class PlanViewSet(viewsets.ModelViewSet):
         task = get_object_or_404(Task, pk=kwargs.get("pk"))
         plan = self.request.user.plan
         plan.tasks.remove(task)
-        plan.save()
-        return Response(PlanSerializer(plan).data, status.HTTP_204_NO_CONTENT)
+        return Response(status.HTTP_204_NO_CONTENT)
 
     @swagger_auto_schema(request_body=no_body)
     @action(methods=['put'], detail=True, serializer_class=None, url_path="start-task")
