@@ -11,3 +11,8 @@ PyJWT==2.8.0
 swagger-spec-validator==3.0.3
 urllib3==1.26.16
 django_extensions==3.2.3
+django_environ==0.11.2
+environ==1.0
+config==0.5.1
+decouple==0.0.7
+python-dotenv==1.0.0

@@ -82,6 +82,8 @@ class UserViewSet(viewsets.ModelViewSet):
             user.set_password(new_password)
             user.save()
             return Response("The password was changed", status.HTTP_200_OK)
+        else:
+            return Response({"message": "Incorrect old password"}, status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['post'], detail=False, serializer_class=FeedbackSerializer, url_path="feedback")
     def feedback(self, request, *args, **kwargs):
@@ -100,4 +102,6 @@ class UserViewSet(viewsets.ModelViewSet):
             send_notification(user.email, "Your secret key for verification account", f"{secret_code}")
             user.verification_code = secret_code
             user.save()
-        return Response({"success": True}, status.HTTP_200_OK)
+            return Response({"success": True}, status.HTTP_200_OK)
+        else:
+            return Response({"success": False}, status.HTTP_400_BAD_REQUEST)
